@@ -36,9 +36,18 @@
         }
         .dashes-div, .buttons-div{
             grid-column: 2/-1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         
         }
 
+        .dashes-div > *{
+            padding:5px;
+            font-size: 100px;
+            font-weight: bolder;
+            
+        }
         .buttons-div{
             display: grid;
             grid-template-columns: repeat(7,1fr);
@@ -68,16 +77,16 @@
         </div>
     </div>
     <script>
-        let dictionary = ['accept','ache','acknowledge','act','add','admire','admit','babble','back','bake','balance','balk','ban','bandage',
-'cajole','calculate','call','camp','care','carry','carve',
-'dam','damage','dance','dare','deal','debate','decay',
-'earn','eat','echo','edit','educate','elope','embarrass',
-'face','fade','fail','fall','falter','fasten',
-'garden','gasp','gather','gaze','gel','get',
-'hail','hammer','hand','handle','hang','happen'];
+        let dictionary = ['accept',];
         let alphbets = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
         var buttons_div = document.querySelector('.buttons-div');
-        var dashes_div = document.querySelector('dashes-div');
+        var dashes_div = document.querySelector('.dashes-div');
+
+        let dashed_string = ""
+        let chosen_word = ""
+        let guessed_chars_set = new Set()
+
+        
         function getRandomWord(){
             let length = dictionary.length
             let index = Math.ceil(Math.random()*length)%length
@@ -90,9 +99,60 @@
                 html += `<div class="button">${content}</div>`;
             }
             buttons_div.innerHTML = html;
+            setTimeout(attachHandlers,100)
+            // attachHandlers()
+        }
+
+        function generateDashedString(chosen_word, guessed_chars){
+            let dashed_string_array = Array.from(dashed_string)
+            if(guessed_chars.length == 0){
+                for(let i = 0;i<chosen_word.length; i++)
+                        dashed_string_array[i] = "_"
+            }
+            else{
+                    for(let i = 0;i<chosen_word.length; i++){
+                        for (let guessed_char of Array.from(guessed_chars)){
+                            if (chosen_word[i] === guessed_char)
+                                dashed_string_array[i] = guessed_char
+                            
+                    }
+                }
+           
+            }
+            
+            dashed_string = dashed_string_array.join("")
+        }
+
+        function updateScreen(e){
+            guessed_chars_set.add(e.target.innerHTML.trim())
+            renderDashedString(chosen_word, Array.from(guessed_chars_set).join(""))
+        }
+
+        function attachHandlers(){
+            let buttons = document.querySelectorAll(".button")
+            for (let i=0;i<buttons.length; i++){
+                buttons[i].onclick = updateScreen
+            }
+
+        }
+
+        function renderDashedString(chosen_word, guessed_chars){
+            generateDashedString(chosen_word, guessed_chars)
+            let html = ""
+            for(let c of Array.from(dashed_string)){
+                html += `<div>${c}</div>`
+            }
+            dashes_div.innerHTML = html
+      
         }
         init();
-        console.log(getRandomWord())
+        chosen_word = getRandomWord()
+        renderDashedString(chosen_word,"")
+
+
+        // renderDashedString(chosen_word,"acp")
+
+
     </script>
 </body>
 </html>
